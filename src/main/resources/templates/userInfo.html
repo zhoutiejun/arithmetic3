@@ -41,6 +41,7 @@
     <div id="main-wrapper">
         <#include "header.ftl" />
         <#include "aside.ftl" />
+
         <div class="page-wrapper">
             <div class="container-fluid">
            
@@ -48,39 +49,39 @@
 					<div class="col-md-4"></div>
                     <div class="col-md-4" style="margin-top : 100px">
                         <div class="card">
-                            <form class="form-horizontal">
+                            <form class="form-horizontal" name="updateUserForm" id="updateUserForm">
                                 <div class="card-body">
                                     <h4 class="card-title">个人信息</h4>
-                                    <div class="form-group row">
+                                    <div class="form-group row" style="display: none">
                                         <label for="fname" class="col-sm-3 text-right control-label col-form-label">账号</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="fname" value="111">
+                                            <input type="text" class="form-control" id="fname" value="${account}" name = "account">
                                         </div>
                                     </div>
-                        
+
                                     <div class="form-group row">
-                                        <label for="lname" class="col-sm-3 text-right control-label col-form-label">密码</label>
+                                        <label class="col-sm-3 text-right control-label col-form-label">密码</label>
                                         <div class="col-sm-9">
-                                            <input type="password" class="form-control" id="lname" value="111">
+                                            <input type="password" class="form-control" name = "password" value="${password}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="email1" class="col-sm-3 text-right control-label col-form-label">姓名</label>
+                                        <label class="col-sm-3 text-right control-label col-form-label">姓名</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="email1" value="暂无">
+                                            <input type="text" class="form-control" id="name" name="name" value="${name}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="cono1" class="col-sm-3 text-right control-label col-form-label">联系方式</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" id="cono1" value="暂无">
+                                            <input type="text" class="form-control" id="cono1" name = "phone" value="${phone}">
                                         </div>
                                     </div>
                        
                                 </div>
                                 <div class="border-top">
                                     <div class="card-body">
-                                        <button type="button" class="btn btn-primary">修改</button>
+                                        <button type="button" class="btn btn-primary" onclick="change()">修改</button>
                                     </div>
                                 </div>
                             </form>
@@ -96,12 +97,6 @@
           
         </div>
     </div>
-    <!-- ============================================================== -->
-    <!-- End Wrapper -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- All Jquery -->
-    <!-- ============================================================== -->
     <script src="../../assets/libs/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap tether Core JavaScript -->
     <script src="../../assets/libs/popper.js/dist/umd/popper.min.js"></script>
@@ -126,23 +121,9 @@
     <script src="../../assets/libs/jquery-minicolors/jquery.minicolors.min.js"></script>
     <script src="../../assets/libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
     <script src="../../assets/libs/quill/dist/quill.min.js"></script>
-    <script>
-        //***********************************//
-        // For select 2
-        //***********************************//
+    <script type="text/javascript">
         $(".select2").select2();
-
-        /*colorpicker*/
         $('.demo').each(function() {
-        //
-        // Dear reader, it's actually very easy to initialize MiniColors. For example:
-        //
-        //  $(selector).minicolors();
-        //
-        // The way I've done it below is just for the demo, so don't get confused
-        // by it. Also, data- attributes aren't supported at this time...they're
-        // only used for this demo.
-        //
         $(this).minicolors({
                 control: $(this).attr('data-control') || 'hue',
                 position: $(this).attr('data-position') || 'bottom left',
@@ -164,10 +145,23 @@
             autoclose: true,
             todayHighlight: true
         });
-        var quill = new Quill('#editor', {
-            theme: 'snow'
-        });
-
+        // 上传发送计算 计算
+        function change() {
+            $.ajax({
+                url : "/user/edit",
+                type: 'POST',
+                data: $('#updateUserForm').serialize(),
+                cache: false,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                success : function(msg){
+                    alert("修改成功")
+                },
+                error : function(msg){
+                }
+            });
+        }
     </script>
 </body>
 

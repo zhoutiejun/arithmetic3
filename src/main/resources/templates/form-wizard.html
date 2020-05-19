@@ -46,19 +46,20 @@
                     <div class="card-body wizard-content">
                         <h4 class="card-title">算法相关</h4>
                         <h6 class="card-subtitle"></h6>
-                        <form id="example-form" action="#" class="m-t-40">
+                        <form id="example-form" name="example-form" class="m-t-40">
                             <div>
-                                <h3>选择训练数据</h3>
+                                <h3>选择接受到的信号数据文件</h3>
                                 <section>
-                                    <label for="data_file">选择文件</label>
+                                    <label for="data_file">信号数据文件</label>
                                     <input id="data_file" name="dataFile" type="file" class="required form-control">
                                 </section>
-                                <h3>确认训练模型</h3>
+                                <h3>选择信号分离算法</h3>
                                 <section>
-                                    <label for="model_file">选择文件</label>
-                                    <input id="model_file" name="modelFile" type="file" class="required form-control">
-                                    <label for="deal_num">迭代次数</label>
-                                    <input id="deal_num" name="dealNum" type="number" class=" form-control">
+                                    <label>选择算法</label>
+                                    <select name= 'type'class="select2 form-control custom-select" style="width: 100%; height:36px;">
+                                        <option value="1">平滑滤波算法</option>
+                                        <option value="2">直方图算法</option>
+                                    </select>
                                 </section>
                                 <h3>结果展示</h3>
                                 <section>
@@ -89,43 +90,62 @@
     <script src="../../assets/libs/jquery-steps/build/jquery.steps.min.js"></script>
     <script src="../../assets/libs/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="/js/echarts.min.js"></script>
-    <script>
-        // Basic Example with form
-    var form = $("#example-form");
-    form.validate({
-        errorPlacement: function errorPlacement(error, element) { element.before(error); },
-        rules: {
-            confirm: {
-                equalTo: "#password"
-            }
-        }
-    });
-     form.children("div").steps({
-        headerTag: "h3",
-        bodyTag: "section",
-        transitionEffect: "slideLeft",
-        onStepChanging: function(event, currentIndex, newIndex) {
-            form.validate().settings.ignore = ":disabled,:hidden";
-            return form.valid();
-        },
-        onFinishing: function(event, currentIndex) {
-            form.validate().settings.ignore = ":disabled";
-            return form.valid();
-        },
-        onFinished: function(event, currentIndex) {
-            alert("Submitted!");
-        }
-    });
-
-
-    </script>
-
-
     <script type="text/javascript">
+
+        var initInterval;
+        // Basic Example with form
+        var form = $("#example-form");
+        form.validate({
+            errorPlacement: function errorPlacement(error, element) { element.before(error); },
+            rules: {
+                confirm: {
+                    equalTo: "#password"
+                }
+            }
+        });
+        form.children("div").steps({
+            headerTag: "h3",
+            bodyTag: "section",
+            transitionEffect: "slideLeft",
+            onStepChanging: function(event, currentIndex, newIndex) {
+                form.validate().settings.ignore = ":disabled,:hidden";
+
+                // 代表跳转到最后一个图形， 那么需要进行处理
+                if(newIndex == 2){
+                    // 发送调用算法的代码
+                    var formData = new FormData($("#example-form")[0]);
+                    $.ajax({
+                        url: '/data/init',
+                        method: 'post',
+                        data: formData,
+                        async: false,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (res) {
+                            console.log("请求成功");
+                        },
+                        error: function (res) {
+                            console.log("请求失败");
+                        }
+                    });
+
+                    // 动态展示每间隔一段时间刷新
+                    initInterval = self.setInterval("clock()",2000);
+                }
+                return form.valid();
+            },
+            onFinishing: function(event, currentIndex) {
+                form.validate().settings.ignore = ":disabled";
+                return form.valid();
+            },
+            onFinished: function(event, currentIndex) {
+//                alert("Submitted!");
+            }
+        });
+
         // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.getElementById('main'));
-
-
         var option = {
             title: {
                 text: 'point: 6'
@@ -150,7 +170,7 @@
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                data: ['1', '2', '3', '4', '5', '6', '7']
             },
             yAxis: {
                 type: 'value'
@@ -170,29 +190,41 @@
                 }
             ]
         };
-
-
-
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
-
-        // 动态展示每间隔一段时间刷新
-        var int=self.setInterval("clock()",2000);
-
         function clock(){
-            var xAxis1 = [];
-            var xAxis2 = [];
-            var indexArr = [];
-            for(var i = 0 ; i< 10 ; i++){
-                indexArr.push(i+1)
-                xAxis1.push(Math.ceil(Math.random()*10));
-                xAxis2.push(Math.ceil(Math.random()*10));
-            }
-            option.title.text = 'point: '+ Math.ceil(Math.random()*10);
-            option.xAxis.data = indexArr;
-            option.series[0].data = xAxis1;
-            option.series[1].data = xAxis2;
-            myChart.setOption(option);
+            // 定期查询后端数据
+            $.ajax({
+                url: '/data/consume',
+                method: 'get',
+                success: function (res) {
+                    if(null == res || "" == res){
+                        window.clearInterval(initInterval);
+                        return
+                    }
+                    option.title.text = 'point: '+ res.point;
+                    option.series[0].data = res.readLine;
+                    option.series[1].data = res.blueLine;
+                    myChart.setOption(option);
+                },
+                error: function (res) {
+                    alert("请求数据失败");
+                }
+            });
+
+//            var xAxis1 = [];
+//            var xAxis2 = [];
+//            var indexArr = [];
+//            for(var i = 0 ; i< 10 ; i++){
+//                indexArr.push(i+1)
+//                xAxis1.push(Math.ceil(Math.random()*10));
+//                xAxis2.push(Math.ceil(Math.random()*10));
+//            }
+//            option.title.text = 'point: '+ Math.ceil(Math.random()*10);
+//            option.xAxis.data = indexArr;
+//            option.series[0].data = xAxis1;
+//            option.series[1].data = xAxis2;
+//            myChart.setOption(option);
         }
 
 

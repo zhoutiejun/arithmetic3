@@ -6,8 +6,8 @@
             <ul id="sidebarnav" class="p-t-30">
                 <li class="sidebar-item"> <a class="sidebar-link has-arrow waves-effect waves-dark" href="javascript:void(0)" aria-expanded="false"><i class="mdi mdi-account-key"></i><span class="hide-menu">用户</span></a>
                     <ul aria-expanded="false" class="collapse  first-level">
-                        <li class="sidebar-item"><a href="/page/userInfo" class="sidebar-link"><i class="mdi mdi-all-inclusive"></i><span class="hide-menu"> 用户信息 </span></a></li>
-                        <li class="sidebar-item"><a href="authentication-register.html" class="sidebar-link"><i class="mdi mdi-all-inclusive"></i><span class="hide-menu"> 用户日志 </span></a></li>
+                        <li class="sidebar-item"><a href="/user/info" class="sidebar-link"><i class="mdi mdi-all-inclusive"></i><span class="hide-menu"> 用户信息 </span></a></li>
+                        <li class="sidebar-item"><a href="/file/log" class="sidebar-link"><i class="mdi mdi-all-inclusive"></i><span class="hide-menu"> 用户日志 </span></a></li>
                     </ul>
                 </li>
 

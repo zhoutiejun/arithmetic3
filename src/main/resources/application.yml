@@ -1,10 +1,17 @@
 spring:
-   freemarker:
-      request-context-attribute: req
-      suffix: .html
-      content-type: text/html
-      enabled: true
-      cache: false
-      charset: UTF-8
-      settings:
-        number_format: '0.##'
+  datasource:
+    url: jdbc:mysql://localhost:3306/arithmetic?characterEncoding=utf8&useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+  freemarker:
+    request-context-attribute: req
+    suffix: .html
+    content-type: text/html
+    enabled: true
+    cache: false
+    charset: UTF-8
+    settings:
+      number_format: '0.##'
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
