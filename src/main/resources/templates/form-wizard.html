@@ -64,7 +64,7 @@
                                 <h3>结果展示</h3>
                                 <section>
                                     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-                                    <div id="main" style="width: 600px;height:400px;"></div>
+                                    <div id="main" style="width: 1200px;height:400px;"></div>
                                 </section>
                             </div>
                         </form>
@@ -118,7 +118,7 @@
                         url: '/data/init',
                         method: 'post',
                         data: formData,
-                        async: false,
+//                        async: false,
                         cache: false,
                         contentType: false,
                         processData: false,
@@ -140,7 +140,20 @@
                 return form.valid();
             },
             onFinished: function(event, currentIndex) {
-//                alert("Submitted!");
+                // 点击这个按钮清空缓存
+                $.ajax({
+                    url: '/data/clear',
+                    method: 'post',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        console.log("清空成功");
+                    },
+                    error: function (res) {
+                        console.log("清空失败");
+                    }
+                });
             }
         });
 
@@ -148,7 +161,7 @@
         var myChart = echarts.init(document.getElementById('main'));
         var option = {
             title: {
-                text: 'point: 6'
+                text: '信号个数: 6'
             },
             tooltip: {
                 trigger: 'axis'
@@ -179,13 +192,11 @@
                 {
                     name: '红线',
                     type: 'line',
-                    stack: '数量',
                     data: [120, 132, 101, 134, 90, 230, 210]
                 },
                 {
                     name: '蓝线',
                     type: 'line',
-                    stack: '数量',
                     data: [220, 182, 191, 234, 290, 330, 310]
                 }
             ]
@@ -202,9 +213,10 @@
                         window.clearInterval(initInterval);
                         return
                     }
-                    option.title.text = 'point: '+ res.point;
+                    option.title.text = '信号个数: '+ res.point;
                     option.series[0].data = res.readLine;
                     option.series[1].data = res.blueLine;
+                    option.xAxis.data = Array.from(Array(res.readLine.length), (v,k) =>k);
                     myChart.setOption(option);
                 },
                 error: function (res) {

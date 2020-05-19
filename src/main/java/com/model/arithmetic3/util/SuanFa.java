@@ -1,14 +1,18 @@
 package com.model.arithmetic3.util;
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
+import GaussFitting2.Class1;
 import com.mathworks.toolbox.javabuilder.MWArray;
 import com.mathworks.toolbox.javabuilder.MWException;
-import GaussFitting2.Class1;
 import com.mathworks.toolbox.javabuilder.MWNumericArray;
 import com.model.arithmetic3.entity.Result;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.lang.Math.floor;
 /**
@@ -18,38 +22,11 @@ import static java.lang.Math.floor;
  */
 public class SuanFa {
 
-    public static Queue<Result> resultList = new ConcurrentLinkedQueue<>();
-
-    public static void testsmoothing(MultipartFile file){
-        //每一秒钟存储一次数据
-        for(int i = 0 ; i< 10 ; i++){
-
-            Result result = new Result();
-            List readList = new ArrayList();
-            List blueList = new ArrayList();
-            for(int j = 0 ; j< 10 ; j++){
-                readList.add(new Random().nextInt(10));
-                blueList.add(new Random().nextInt(20));
-            }
-            result.setBlueLine(readList);
-            result.setReadLine(blueList);
-            result.setPoint(new Random().nextInt(40));
-            resultList.add(result);
-        }
-    }
+    public static Queue<Result> resultList = new LinkedBlockingQueue<>(2000);
 
     public static void smoothing(MultipartFile file) throws IOException {
         float[][] array = readFile(file);
         //测试读取数据有没有错误
-
-//        for(int i = 0;i<array.length;i++)
-//        {
-//            for (int j = 0;j<array[0].length;j++) {
-//                System.out.print(array[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println(array.length+"  "+array[0].length);那就
         int wsize = 50;
         int segNum = (int) Math.floor(array[0].length/wsize);
         float alpha = (float) 0.9;
@@ -142,11 +119,13 @@ public class SuanFa {
             System.out.println("蓝线："+reMeanData);                      //蓝线 即信号
             System.out.println("红线："+threshold);                       //红线  即分割线
             Integer signalNum = SignalNum(reMeanData,threshold);
-            System.out.println("这一帧信号个数："+signalNum);    //信号个数
+            System.out.println("这一帧信号个数："+signalNum);
             Result result = new Result();
-            result.setBlueLine(reMeanData);
-            result.setReadLine(threshold);
+            result.setBlueLine(new ArrayList<>(reMeanData));
+            result.setReadLine( new ArrayList<>(threshold));
             result.setPoint(signalNum);
+            System.out.println(resultList.size());
+            resultList.add(result);
         }
     }          // 算法1 平滑滤波算法
 
@@ -361,9 +340,11 @@ public class SuanFa {
             Integer signalNum = SignalNum(reMeanData,threshold);
             System.out.println("这一帧信号个数："+signalNum);    //信号个数
             Result result = new Result();
-            result.setBlueLine(reMeanData);
-            result.setReadLine(threshold);
+            result.setBlueLine(new ArrayList<>(reMeanData));
+            result.setReadLine( new ArrayList<>(threshold));
             result.setPoint(signalNum);
+
+            resultList.add(result);
         }
     }  //算法2  直方图算法
 

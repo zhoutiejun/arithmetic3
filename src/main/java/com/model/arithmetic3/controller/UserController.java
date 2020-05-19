@@ -97,4 +97,12 @@ public class UserController {
         return resultList.poll();
     }
 
+    /**
+     * 定时获取数据
+     */
+    @PostMapping("/data/clear")
+    public void clearData(){
+        SuanFa.resultList.clear();
+    }
+
 }
